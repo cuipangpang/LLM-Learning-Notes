@@ -1,0 +1,380 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="920" height="4200" viewBox="0 0 920 4200">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#737268"/>
+    </marker>
+  </defs>
+  <rect width="920" height="4200" fill="#ffffff"/>
+
+  <!-- ===== TITLE ===== -->
+  <text x="460" y="36" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="600" fill="#14140f">大模型架构图</text>
+  <text x="460" y="58" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#3d3d3a" opacity="0.5">输入→分词→Embedding→位置编码→Pre-Norm→QKV→SDPA→多头合并→FFN→Linear→Softmax→解码</text>
+
+  <!-- 左侧主流程竖线 -->
+  <rect x="8" y="72" width="20" height="4060" rx="4" fill="none" stroke="#1f1e1d" stroke-opacity="0.12" stroke-width="0.5" stroke-dasharray="4,4"/>
+  <text x="18" y="2100" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="10" fill="#3d3d3a" opacity="0.35" transform="rotate(-90,18,2100)">主流程（自回归生成，每次生成1个token后重复以上全流程）</text>
+
+  <!-- ============================================================
+       STEP 1: 输入  y=80
+  ============================================================ -->
+  <rect x="40" y="80" width="185" height="52" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="101" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#444441">输入</text>
+  <text x="132" y="121" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5f5e5a">原始文本字符串</text>
+  <text x="238" y="97" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN: 原始字符串</text>
+  <text x="238" y="115" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: 原始字符串，等待分词</text>
+  <line x1="132" y1="132" x2="132" y2="154" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 2: 分词算法  y=158
+  ============================================================ -->
+  <rect x="40" y="158" width="185" height="52" rx="8" fill="#e6f1fb" stroke="#18608a" stroke-width="0.5"/>
+  <text x="132" y="179" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#0c447c">分词算法 Tokenizer</text>
+  <text x="132" y="199" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185fa5">文本 → subword 片段列表</text>
+  <text x="238" y="175" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5"></text>
+  <text x="238" y="191" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5"></text>
+  <!-- 引线 -->
+  <line x1="225" y1="184" x2="258" y2="184" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 分词知识点框  高度=290 -->
+  <rect x="258" y="148" width="646" height="290" rx="6" fill="#e6f1fb" stroke="#18608a" stroke-width="0.5"/>
+  <text x="278" y="170" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#0c447c">分词算法：</text>
+  <!-- BPE -->
+  <text x="278" y="194" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#0c447c">① BPE</text>
+  <text x="290" y="212" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">原理：按频率找token对</text>
+  <text x="290" y="228" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">缺点：解码有歧义；不能提供带概率的多个分词结果</text>
+  <!-- BBPE -->
+  <text x="278" y="250" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#0c447c">② BBPE（GPT-3/4）</text>
+  <text x="290" y="268" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">在BPE基础上从字符级变为字节级</text>
+  <text x="290" y="284" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">优点：无OOV，任何语言/emoji都能处理；缺点：需要上下文信息 + 动态规划解码</text>
+  <!-- WordPiece -->
+  <text x="278" y="306" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#0c447c">③ WordPiece（BERT）</text>
+  <text x="290" y="324" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">让合并后概率最大</text>
+  <!-- ULM -->
+  <text x="278" y="362" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#0c447c">④ ULM（T5 / ALBERT）</text>
+  <text x="290" y="380" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">先全放，然后删loss增加少的</text>
+  <text x="290" y="396" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#185fa5">删除标准：删掉后 loss 增加最小的被删（删掉代价小）；删后 loss 增加大的 → 留下当骨干</text>
+
+  <!-- arrow -->
+  <line x1="132" y1="210" x2="132" y2="452" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       STEP 3: 查词表  y=456
+  ============================================================ -->
+  <rect x="40" y="456" width="185" height="52" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="477" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#444441">查词表 → Token ID</text>
+  <text x="132" y="497" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5f5e5a">映射字典（固定词表大小）</text>
+  <text x="238" y="473" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  ["原","始","字","符","串"]</text>
+  <text x="238" y="491" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: [1234, 89, 567, 2341, 890]（举例）  整数序列</text>
+  <line x1="132" y1="508" x2="132" y2="530" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 4: Embedding  y=534
+  ============================================================ -->
+  <rect x="40" y="534" width="185" height="52" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+  <text x="132" y="555" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#085041">Embedding 层</text>
+  <text x="132" y="575" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#0f6e56">每个 ID → d 维词向量</text>
+  <text x="238" y="551" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  整数序列 [1234, 89, 567, ...]</text>
+  <text x="238" y="569" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 浮点矩阵，d 通常 768 / 4096</text>
+  <line x1="225" y1="560" x2="258" y2="560" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- Embedding 知识点框  高度=230 -->
+  <rect x="258" y="522" width="646" height="230" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+  <text x="278" y="544" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#085041">词向量训练方法 &amp; Embedding 本质</text>
+  <text x="278" y="566" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">Word2Vec</text>
+  <text x="290" y="584" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">取隐藏层为词向量：One-Hot(5万维) → × W矩阵(5万×300) → 隐藏层300维向量 = 词向量</text>
+  <text x="290" y="602" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">CBOW：根据语境预测当前词；Skip-gram：根据当前词预测语境（两种任务）</text>
+  <text x="290" y="620" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">加速：霍夫曼树（高频词放近，低频词放远）+ 负采样（只学几个正负例，不全量采样）</text>
+  <text x="278" y="642" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">FastText</text>
+  <text x="290" y="660" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">词向量 = N-gram 字符片段向量取平均（包含完整词）；解决 OOV；韩德语等形态丰富语言效果好</text>
+  <text x="290" y="678" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">另有分类模式（预测标签）：直接用词向量做文本分类，损失函数为 Softmax + 交叉熵</text>
+  <text x="278" y="700" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">词嵌入本质：把词投射到高维空间，语义相似的词距离近，语义关系体现为向量运算（国王-男人+女人≈女后）</text>
+  <text x="278" y="718" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">静态词向量 vs 动态词向量：Word2Vec同词=同向量；现代LLM的Embedding是动态的，"苹果"在不同上下文向量不同</text>
+  <line x1="132" y1="586" x2="132" y2="758" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       STEP 5: 位置编码  y=762
+  ============================================================ -->
+  <rect x="40" y="762" width="185" height="52" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+  <text x="132" y="783" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#085041">位置编码 +</text>
+  <text x="132" y="803" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#0f6e56">词向量 + 位置信息</text>
+  <text x="238" y="779" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  (T, d) 词向量矩阵</text>
+  <text x="238" y="797" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 含位置信息的向量，每位置向量唯一</text>
+  <line x1="225" y1="788" x2="258" y2="788" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 位置编码知识点框  高度=500 -->
+  <rect x="258" y="750" width="646" height="500" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+  <text x="278" y="772" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#085041">位置编码进化史（Transformer 天然不知顺序，必须手动告知位置）</text>
+  <!-- 1 -->
+  <text x="278" y="796" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">① 三角函数编码（原始 Transformer）</text>
+  <text x="290" y="814" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">PE(pos,2i) = sin(pos/10000^(2i/d))；理论上 sin(a+b) 可表示相对距离</text>
+  <text x="290" y="832" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">问题：x_m=(词向量+PE_m) 经 W_Q 变换后，PE_m 的线性关系被矩阵乘法打乱 → 无法外推</text>
+  <!-- 2 -->
+  <text x="278" y="856" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">② BERT 可训练参数位置编码</text>
+  <text x="290" y="874" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">位置编码作为可学习参数，与词向量相加；简单有效；无法外推到训练长度之外</text>
+  <!-- 3 -->
+  <text x="278" y="898" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">③ RNN 递归式绝对位置编码</text>
+  <text x="290" y="916" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">隐状态 h 携带位置信息逐步传递；顺序依赖，难以并行，长序列梯度消失</text>
+  <!-- 4 -->
+  <text x="278" y="940" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">④ 相对位置编码（作用在 SDPA 的 QK 计算中）</text>
+  <text x="290" y="958" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">核心公式：score(m,n) = Q_m · K_n + f(m-n)  ← 位置信息融入注意力分数</text>
+  <text x="290" y="976" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">RPR：K + 相对向量r；XLNet：分解 Q·K；T5：可训练偏置，只保留内容-内容 + 位置-位置项</text>
+  <text x="290" y="994" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">DeBERTa：内容位置解耦，保留内容-位置、位置-内容，丢弃位置-位置项</text>
+  <!-- 5 RoPE -->
+  <text x="278" y="1018" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">⑤ RoPE 旋转位置编码（LLaMA / Qwen）← 作用在 QK 内积计算时</text>
+  <text x="290" y="1036" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">核心：a'·b' = a·b × cos(α-β)  ← 内积只依赖旋转角度差，不依赖绝对位置！</text>
+  <text x="290" y="1054" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">实现：向量拆成 d/2 对，每对在各自二维平面旋转；问题：超长序列绝对角度超范围</text>
+  <text x="290" y="1072" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">长度外推优化（本质：把超出范围的位置映射回训练见过的范围）：</text>
+  <text x="300" y="1090" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">直接外推：高频维度角度超范围 → 崩溃</text>
+  <text x="300" y="1108" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">位置内推：m 除以缩放因子 s = 新长度/训练长度 → 低频维度过度压缩</text>
+  <text x="300" y="1126" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">NTK-Aware：换底数，高频大压缩/低频小压缩（静态固定）</text>
+  <text x="300" y="1144" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Dynamic NTK：动态选择底数（根据实际序列长度自适应）</text>
+  <text x="300" y="1162" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">YaRN：分频段处理 — 低频直接外推 / 中频改底数 / 高频等比压缩</text>
+  <!-- 6 ALiBi -->
+  <text x="278" y="1186" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#085041">⑥ ALiBi（天然外推）</text>
+  <text x="290" y="1204" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">score = QKᵀ/√d - m·|i-j|  距离越远惩罚越多；无需修改向量，直接在注意力分数减线性惩罚</text>
+  <text x="290" y="1222" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#0f6e56">优点：天然支持长度外推；缺点：固定衰减率，无法学习复杂相对关系</text>
+  <!-- 相对位置编码→SDPA 连线 -->
+  <line x1="895" y1="970" x2="908" y2="970" stroke="#0f6e56" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="908" y1="970" x2="908" y2="1780" stroke="#0f6e56" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="908" y1="1780" x2="895" y2="1780" stroke="#0f6e56" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <text x="912" y="1400" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="10" fill="#0f6e56" opacity="0.45" transform="rotate(90,912,1400)">相对位置编码（RPR/T5/DeBERTa/RoPE/ALiBi）作用于 SDPA 的 QK 内积计算</text>
+  <!-- arrow -->
+  <line x1="132" y1="814" x2="132" y2="1264" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       STEP 6: Pre-Norm  y=1268
+  ============================================================ -->
+  <rect x="40" y="1268" width="185" height="52" rx="8" fill="#faeeda" stroke="#854f0b" stroke-width="0.5"/>
+  <text x="132" y="1287" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">Pre-Norm（层归一化）</text>
+  <text x="132" y="1307" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854f0b">稳定训练，缓解梯度消失</text>
+  <text x="238" y="1285" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  (T, d) 原始词向量</text>
+  <text x="238" y="1303" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: 均值≈0, 方差≈1 的归一化向量</text>
+  <line x1="225" y1="1294" x2="258" y2="1294" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 归一化知识点框  高度=240 -->
+  <rect x="258" y="1256" width="646" height="240" rx="6" fill="#faeeda" stroke="#854f0b" stroke-width="0.5"/>
+  <text x="278" y="1278" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#633806">归一化方法对比（H高 W宽 C通道/特征 N样本数）</text>
+  <text x="278" y="1302" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#633806">BatchNorm（N维归一化）</text>
+  <text x="290" y="1320" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#854f0b">跨样本归一化；CV 常用；NLP 不适合（序列长度不同，batch 统计不稳定，会破坏上下文信息）</text>
+  <text x="278" y="1344" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#633806">LayerNorm（C维归一化）← NLP / LLM 首选</text>
+  <text x="290" y="1362" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#854f0b">对每个 token 的 d 维特征独立归一化；保留上下文分布信息；公式：(x-μ)/σ × γ + β</text>
+  <text x="278" y="1386" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#633806">RMSNorm（LLaMA / Qwen）← 去掉减均值步骤，更快</text>
+  <text x="290" y="1404" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#854f0b">x / RMS(x) × γ；去掉均值计算，速度更快；效果接近 LayerNorm；LLaMA/Qwen 采用</text>
+  <text x="278" y="1428" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#854f0b">其他：InstanceNorm(在C和N维度归一化)；GroupNorm(在C上分组归一化)</text>
+  <text x="278" y="1450" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#633806">归一化位置策略</text>
+  <text x="290" y="1468" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#854f0b">Post-Norm：训练不稳定 | Pre-Norm：现代LLM首选，稳定但牺牲深度 | Sandwich-Norm：容易崩溃</text>
+  <!-- arrow -->
+  <line x1="132" y1="1320" x2="132" y2="1342" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 7: QKV投影  y=1346
+  ============================================================ -->
+  <rect x="40" y="1346" width="185" height="52" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+  <text x="132" y="1367" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#3c3489">QKV 投影</text>
+  <text x="132" y="1387" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#534ab7">x → Q, K, V 三个矩阵</text>
+  <text x="238" y="1363" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  (T, d) 归一化向量</text>
+  <text x="238" y="1381" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: Q(T, d_k)  K(T, d_k)  V(T, d_v)</text>
+  <line x1="225" y1="1372" x2="258" y2="1372" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- QKV知识点框  高度=160 -->
+  <rect x="258" y="1334" width="646" height="160" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+  <text x="278" y="1356" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#3c3489">Q / K / V 三个角色的含义与计算</text>
+  <text x="278" y="1378" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">词向量中三种信息互相干扰，拆成三个矩阵分别投影到对应空间，避免混淆，各司其职</text>
+  <text x="278" y="1400" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">Q（Query）：查询角色 — 我想问什么 / 关注什么</text>
+  <text x="278" y="1420" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">K（Key）：被查角色 — 我有什么信息可以被关注</text>
+  <text x="278" y="1440" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">V（Value）：内容角色 — 实际传递出去的信息内容</text>
+  <text x="278" y="1462" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Q = x · W_Q   K = x · W_K   V = x · W_V；三个权重矩阵都是可学习参数，从数据中学习</text>
+  <text x="278" y="1480" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">自注意力：Q/K/V 都来自同一输入序列（捕捉内部关系）；交叉注意力：Q来自一个序列，K/V来自另一个</text>
+  <!-- arrow -->
+  <line x1="132" y1="1398" x2="132" y2="1420" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 8: SDPA  y=1424
+  ============================================================ -->
+  <rect x="40" y="1424" width="185" height="66" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+  <text x="132" y="1445" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#3c3489">SDPA</text>
+  <text x="132" y="1463" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">softmax(QKᵀ/√d)·V</text>
+  <text x="132" y="1481" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">缩放点积注意力</text>
+  <text x="238" y="1441" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  Q K V 三个矩阵</text>
+  <text x="238" y="1459" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: context 向量 (T, d)</text>
+  <text x="238" y="1477" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">每个 token 融合了全局上下文信息</text>
+  <line x1="225" y1="1457" x2="258" y2="1457" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- SDPA 大知识点框  高度=900 -->
+  <rect x="258" y="1412" width="646" height="900" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+  <text x="278" y="1436" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#3c3489">SDPA 公式详解 + 三大优化方向</text>
+  <!-- 公式 -->
+  <text x="278" y="1458" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">公式：Attention = softmax(QKᵀ / √d_k) · V</text>
+  <text x="290" y="1476" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">QKᵀ：计算每对 token 的余弦相似度（空间向量夹角）；点积越大表示两个 token 越相关</text>
+  <text x="290" y="1494" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">除 √d_k：把方差重新变回1，防止 softmax 进入极度饱和区（梯度消失）</text>
+  <text x="290" y="1512" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">softmax：解决分数有负数问题，将相似度分数变为可解释的概率分布（加和 = 1）</text>
+  <text x="290" y="1530" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">· V：按注意力权重加权融合信息，把各 token 的内容按权重混合；decoder 用 causal mask 遮住未来</text>
+  <!-- 分割线 -->
+  <line x1="268" y1="1548" x2="894" y2="1548" stroke="#534ab7" stroke-width="0.3" stroke-dasharray="3,3"/>
+  <!-- 优化1 -->
+  <text x="278" y="1570" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">优化① 计算复杂度优化（O(T²) → 更低复杂度）</text>
+  <text x="290" y="1588" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Sparse Attention：空洞 attention（稀疏远程）+ Local attention（局部紧密）混合，不计算所有位置对</text>
+  <text x="290" y="1606" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Linear Attention：softmax(QKᵀ) 改写为 φ(Q)φ(K)ᵀ，先算 K·V 再算 Q，复杂度 O(T²)→O(T)</text>
+  <text x="290" y="1624" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">DCA（Dual Chunk Attention）：先分块，块内互相看，只关注最近几块，其他跳过；局部紧密 + 远程稀疏</text>
+  <!-- 分割线 -->
+  <line x1="268" y1="1642" x2="894" y2="1642" stroke="#534ab7" stroke-width="0.3" stroke-dasharray="3,3"/>
+  <!-- 优化2 KV Cache -->
+  <text x="278" y="1664" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">优化② KV Cache（避免重复计算历史 K/V，加速自回归推理）</text>
+  <text x="290" y="1682" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">每次生成新 token 只用新 Q 和缓存的 K/V 计算；KV Cache 就是 Context 在显存里的物理存储形式</text>
+  <text x="290" y="1700" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">显存占用：B × h × T × d_h × 2；T 越长显存越大，这是长上下文的主要成本瓶颈</text>
+  <text x="278" y="1722" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" font-weight="600" fill="#3c3489">A. 滑动窗口</text>
+  <text x="290" y="1740" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">朴素滑动窗口：只保留最近 N 个 token，直接丢弃早期内容；简单但丢失长期依赖</text>
+  <text x="290" y="1758" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">StreamingLLM：保留开头 Attention Sink tokens + 最近 N 个 token；开头token权重异常高不能丢</text>
+  <text x="278" y="1780" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" font-weight="600" fill="#3c3489">B. 多头注意力进化（减小 KV Cache 体积）</text>
+  <text x="290" y="1798" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">MHA：h 个头各自独立 KV，Cache = B×h×T×d_h×2，质量好但很大</text>
+  <text x="290" y="1816" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">MQA：所有 Q 头共享 1 套 KV，Cache 少 h 倍，表达力略降</text>
+  <text x="290" y="1834" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">GQA（Qwen / LLaMA3）：Q 的 h 头分 G 组，每组共 1 套 KV，折中方案；LLaMA3-8B: h=32, G=8 → 少4倍</text>
+  <text x="290" y="1852" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">MLA（DeepSeek）：不存完整 KV，缓存低秩压缩向量 c，用时再解压；用低秩矩阵近似完整 KV</text>
+  <text x="290" y="1870" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">S²Attention：序列切段分 GPU，通过 shift 错位机制获取其他 GPU 的信息；多机长文本</text>
+  <text x="278" y="1892" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" font-weight="600" fill="#3c3489">C. 门控注意力（增强表达力 / 选择性）</text>
+  <text x="290" y="1910" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">GLU：走两路径，路径1提取内容 W1·x，路径2学哪些维度重要 V·x，输出 = 路径1 × sigmoid(路径2)</text>
+  <text x="290" y="1928" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">ReGLU(ReLU) / GeGLU(GELU) / SwiGLU(SiLU)：只是门控激活函数不同，结构完全一样</text>
+  <text x="290" y="1946" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">GRU（重置门+更新门）/ LSTM（输入门+遗忘门+输出门）：解决 RNN 长序列梯度消失问题</text>
+  <text x="278" y="1968" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" font-weight="600" fill="#3c3489">D. KV Cache 量化</text>
+  <text x="290" y="1986" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">imDeploy per-token INT8 量化：K/V 从 FP32 压缩为 INT8，每个 token 有自己的 scale + zero_point</text>
+  <text x="290" y="2004" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">用时反量化回 FP16 再算；精度比 per-tensor 量化高；显存减少约 75%</text>
+  <!-- 分割线 -->
+  <line x1="268" y1="2022" x2="894" y2="2022" stroke="#534ab7" stroke-width="0.3" stroke-dasharray="3,3"/>
+  <!-- 优化3 G1 Gate -->
+  <text x="278" y="2044" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#3c3489">优化③ G1 Gate（SDPA 输出加稀疏 query-dependent sigmoid 门控）</text>
+  <text x="290" y="2062" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">解决 Attention Sink：softmax 权重和必须=1，无关权重全堆到 BOS token（垃圾桶）→ Gate 直接压为 0</text>
+  <text x="290" y="2080" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">解决 Massive Activation：某些维度值异常大（正常几 → 几千）→ 残差越传越大 → BF16 崩溃</text>
+  <text x="290" y="2098" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">→ Gate 乘以接近 0 的值，压回正常范围；同时增强非线性表达能力</text>
+  <text x="290" y="2116" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Head-Specific：每个注意力头有独立 gate 参数（不同头负责不同语义，需要各自的过滤标准）</text>
+  <text x="290" y="2134" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">Query-Dependent：gate 由当前 token 的内容 x 动态计算，每个 token 有不同的过滤方式</text>
+  <text x="290" y="2152" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#534ab7">提升长上下文扩展能力和训练稳定性；SDPA 输出加一个稀疏的 sigmoid gate 层</text>
+  <!-- SDPA arrow -->
+  <line x1="132" y1="1490" x2="132" y2="2320" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       STEP 9: 多头合并+W_O  y=2324
+  ============================================================ -->
+  <rect x="40" y="2324" width="185" height="52" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="2343" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#444441">多头合并 + W_O 投影</text>
+  <text x="132" y="2363" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5f5e5a">h个头拼接 → 线性变换</text>
+  <text x="238" y="2341" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  h × (T, d_h) 各头输出</text>
+  <text x="238" y="2359" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 统一维度，混合所有头信息</text>
+  <line x1="225" y1="2350" x2="258" y2="2350" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <rect x="258" y="2312" width="646" height="72" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="278" y="2334" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">concat(head_1, ..., head_h) → reshape(T, d) → × W_O(d, d) → 混合所有头信息，统一表示空间</text>
+  <text x="278" y="2352" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">W_O 的作用：让不同头关注的信息（语法/语义/位置等）在同一空间中融合，增强整体表达</text>
+  <text x="278" y="2370" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">多头的意义：一个头只能学一种关注模式，多头可以同时学语法/语义/位置/指代等不同关系</text>
+  <line x1="132" y1="2376" x2="132" y2="2398" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 10: 残差+Pre-Norm (Attn后)  y=2402
+  ============================================================ -->
+  <rect x="40" y="2402" width="185" height="52" rx="8" fill="#faeeda" stroke="#854f0b" stroke-width="0.5"/>
+  <text x="132" y="2421" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">残差连接 + Pre-Norm</text>
+  <text x="132" y="2441" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854f0b">x = x + Attn(Norm(x))</text>
+  <text x="238" y="2419" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  原始 x + Attn 输出</text>
+  <text x="238" y="2437" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 含注意力信息，梯度通路畅通</text>
+  <line x1="132" y1="2454" x2="132" y2="2476" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 11: FFN  y=2480
+  ============================================================ -->
+  <rect x="40" y="2480" width="185" height="52" rx="8" fill="#faece7" stroke="#993c1d" stroke-width="0.5"/>
+  <text x="132" y="2499" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#711b0c">FFN（SwiGLU）</text>
+  <text x="132" y="2519" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#993c1d">两路径：内容 × 门控权重</text>
+  <text x="238" y="2497" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  (T, d) 注意力输出</text>
+  <text x="238" y="2515" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 非线性变换结果</text>
+  <line x1="225" y1="2506" x2="258" y2="2506" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- FFN知识点框  高度=310 -->
+  <rect x="258" y="2468" width="646" height="310" rx="6" fill="#faece7" stroke="#993c1d" stroke-width="0.5"/>
+  <text x="278" y="2490" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#711b0c">FFN 两大优化：SwiGLU &amp; MoE</text>
+  <text x="278" y="2512" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#711b0c">SwiGLU（LLaMA / Qwen）</text>
+  <text x="290" y="2530" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">标准FFN：x → Linear → 激活 → Linear；问题：激活函数不够好，非线性表达力不足</text>
+  <text x="290" y="2548" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">GLU思想：走两路径，路径1提取内容 W_1·x，路径2学哪些维度重要 V·x</text>
+  <text x="290" y="2566" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">输出 = 路径1 × sigmoid(路径2)；门控决定哪些信息流过去</text>
+  <text x="290" y="2584" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">SwiGLU = 用 SiLU(x) = x · sigmoid(x) 替代 sigmoid；SiLU 是 Swish(β=1) 的特例</text>
+  <text x="290" y="2602" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">ReGLU(ReLU) / GeGLU(GELU) / SwiGLU(SiLU)：只是门控激活函数不同，结构完全一样</text>
+  <text x="278" y="2624" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#711b0c">MoE 混合专家模型（替换 FFN，稀疏激活）</text>
+  <text x="290" y="2642" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">出现原因：FFN 是稠密层，每次推理激活全部参数，模型大了计算量线性增长</text>
+  <text x="290" y="2660" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">框架：把 FFN 替换为 N 个专家网络 + 一个门控网络（线性层+softmax）；门控帮 token 选择 Top-K 专家</text>
+  <text x="290" y="2678" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">稀疏激活：每次只激活部分专家 → 参数量大但计算量小；每个专家学习不同知识领域</text>
+  <text x="290" y="2696" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">负载均衡：引入高斯噪声 + 辅助损失（降低变异系数）+ 容量限制，避免专家分配不均</text>
+  <text x="290" y="2714" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">Mixtral 8×7B：8 个专家每次选 2 个，活跃参数约 12.9B，效果接近 70B 稠密模型</text>
+  <text x="290" y="2732" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">稀疏混合专家：选少数专家；密集混合专家：选所有专家（退化为普通 FFN 组合）</text>
+  <text x="290" y="2750" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#993c1d">门控计算：输入 x × 权重矩阵 W（训练出来的）+ softmax → 概率分布 → Top-K 选择 → 加权求和输出</text>
+  <line x1="132" y1="2532" x2="132" y2="2784" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       STEP 12: 残差+Norm (FFN后)  y=2788
+  ============================================================ -->
+  <rect x="40" y="2788" width="185" height="52" rx="8" fill="#faeeda" stroke="#854f0b" stroke-width="0.5"/>
+  <text x="132" y="2807" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">残差连接 + Norm</text>
+  <text x="132" y="2827" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854f0b">x = x + FFN(Norm(x))</text>
+  <text x="238" y="2805" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  上一步 x + FFN 输出</text>
+  <text x="238" y="2823" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, d) 最终表示向量，梯度畅通</text>
+  <line x1="132" y1="2840" x2="132" y2="2862" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- N层重复提示 -->
+  <rect x="40" y="2866" width="185" height="36" rx="6" fill="none" stroke="#5f5e5a" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <text x="132" y="2889" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.6">↑ Attention+FFN 重复 N 层 ↑</text>
+  <line x1="132" y1="2902" x2="132" y2="2924" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 13: Linear LM Head  y=2928
+  ============================================================ -->
+  <rect x="40" y="2928" width="185" height="52" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="2947" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#444441">Linear（LM Head）</text>
+  <text x="132" y="2967" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5f5e5a">d → 词表大小（logits）</text>
+  <text x="238" y="2945" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  (T, d) 最终隐状态</text>
+  <text x="238" y="2963" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: (T, vocab_size) logits 向量</text>
+  <line x1="225" y1="2954" x2="258" y2="2954" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <rect x="258" y="2916" width="646" height="72" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="278" y="2938" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">线性层将 d 维向量投影到词表大小（如 32000 / 151936），得到每个词的未归一化得分 logits</text>
+  <text x="278" y="2956" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">通常与 Embedding 层共享权重（weight tying），减少参数量；取最后一个 token 的 logits 做预测</text>
+  <text x="278" y="2974" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#444441">logits 是未经归一化的分数，正负均可；下一步 Softmax 将其转化为概率</text>
+  <line x1="132" y1="2980" x2="132" y2="3002" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 14: Softmax  y=3006
+  ============================================================ -->
+  <rect x="40" y="3006" width="185" height="52" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="3025" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#444441">Softmax</text>
+  <text x="132" y="3045" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5f5e5a">logits → 概率分布</text>
+  <text x="238" y="3023" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  vocab_size 维 logits 向量</text>
+  <text x="238" y="3041" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: vocab_size 维概率分布（加和 = 1）</text>
+  <line x1="132" y1="3058" x2="132" y2="3080" stroke="#737268" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ============================================================
+       STEP 15: 解码采样策略  y=3084
+  ============================================================ -->
+  <rect x="40" y="3084" width="185" height="52" rx="8" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+  <text x="132" y="3103" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#173404">解码采样策略</text>
+  <text x="132" y="3123" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#3b6d11">概率分布 → 下一个词</text>
+  <text x="238" y="3101" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">IN:  vocab_size 维概率分布</text>
+  <text x="238" y="3119" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">OUT: 下一个 token（整数 ID）</text>
+  <line x1="225" y1="3110" x2="258" y2="3110" stroke="#737268" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 解码知识点框  高度=380 -->
+  <rect x="258" y="3072" width="646" height="380" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+  <text x="278" y="3094" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="600" fill="#173404">解码采样策略详解（根据任务类型选择）</text>
+  <text x="278" y="3116" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">① 贪心搜索（Greedy）</text>
+  <text x="290" y="3134" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">每步只选最高概率的词；确定性，适合翻译/需要标准答案；缺点：容易陷入重复，多样性差</text>
+  <text x="278" y="3156" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">② Beam Search（集束搜索）</text>
+  <text x="290" y="3174" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">每步保留 k 条最优路径，每步继续扩展；适合摘要/翻译；生成结果偏保守，多样性低</text>
+  <text x="278" y="3196" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">③ Top-k 采样</text>
+  <text x="290" y="3214" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">从概率排名前 k 个词中随机采样；增加多样性；k=1 退化为贪心；k 过大噪声多</text>
+  <text x="278" y="3236" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">④ Top-p（Nucleus）采样</text>
+  <text x="290" y="3254" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">在累计概率超过 p 的最小词集中采样；动态调整候选数量，比 Top-k 更自适应</text>
+  <text x="278" y="3276" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">⑤ Temperature（温度参数）</text>
+  <text x="290" y="3294" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">在 softmax 加温度 T：logits/T；T 大→概率平坦→随机；T 小→概率集中→确定</text>
+  <text x="290" y="3312" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">联合采样：先进行 Top-k → Top-p → Temperature 采样，三者叠加效果最好</text>
+  <text x="278" y="3334" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">⑥ Best-of-N（训练对齐阶段首选）</text>
+  <text x="290" y="3352" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">生成 N 个回答 → 奖励模型打分（结果RM 或 过程RM）→ 选分数最高的；类比专家打分取最优</text>
+  <text x="278" y="3374" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">⑦ Majority Vote（投票）</text>
+  <text x="290" y="3392" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">多次采样后投票，选出现最多的答案；适合有唯一正确答案的问题</text>
+  <text x="278" y="3414" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="600" fill="#173404">⑧ Self-Consistency（推理/数学题首选）</text>
+  <text x="290" y="3432" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3b6d11">在 Majority Vote 基础上增加思维链 CoT：多条推理路径 + 投票取答案；比 Majority Vote 效果更好</text>
+  <!-- arrow -->
+  <line x1="132" y1="3136" x2="132" y2="3460" stroke="#737268" stroke-width="1.5" stroke-dasharray="3,2"/>
+
+  <!-- ============================================================
+       最终输出  y=3464
+  ============================================================ -->
+  <rect x="40" y="3464" width="185" height="40" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+  <text x="132" y="3489" text-anchor="middle" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#444441">输出 Token</text>
+  <text x="238" y="3485" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#3d3d3a" opacity="0.5">→ 生成的下一个词，拼接到输入后重复以上全流程</text>
+</svg>
